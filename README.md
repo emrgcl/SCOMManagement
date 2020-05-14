@@ -11,3 +11,8 @@ Lists notification subscriptions and the groups those used within the notificati
 
 ## add-ManagementGroupToOrphanedAgents.ps1
 If the Agent is insalled right out of the IMage and is not connected to any management group this script will help in prvosioning the agent to the management server and by default if the management group exists but the management server name is wrong (mistyped before) fixes it. 
+
+## Set-SCOMHSLogonType.ps1
+Sets scom 2019 agent to work runas accounts with either logon as a service or logon locally rights.
+ - Please refer to Kevin Holman at https://kevinholman.com/2019/03/14/security-changes-in-scom-2019-log-on-as-a-service/
+ - Plrease refer to Microsoft Documentation at https://docs.microsoft.com/en-us/system-center/scom/enable-service-logon?view=sc-om-2019 .
