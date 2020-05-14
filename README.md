@@ -16,3 +16,15 @@ If the Agent is insalled right out of the IMage and is not connected to any mana
 Sets scom 2019 agent to work runas accounts with either logon as a service or logon locally rights.
  - Please refer to Kevin Holman at https://kevinholman.com/2019/03/14/security-changes-in-scom-2019-log-on-as-a-service/
  - Plrease refer to Microsoft Documentation at https://docs.microsoft.com/en-us/system-center/scom/enable-service-logon?view=sc-om-2019 .
+
+
+ # TODO
+
+ - update set-scomhslogontype.ps1 to refer to  tmfver.dll autoamtically.
+```
+ Set objShell = WScript.CreateObject("WScript.Shell")
+sngVersion = objShell.RegRead("HKLM\SOFTWARE\Microsoft\Microsoft Operations Manager\3.0\Setup\InstallDirectory")
+
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+fileVer = objFSO.GetFileVersion(sngVersion & "Tools\TMF\" & "OMAgentTraceTMFVer.Dll")
+```
