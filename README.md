@@ -17,6 +17,8 @@ Sets scom 2019 agent to work runas accounts with either logon as a service or lo
  - Please refer to Kevin Holman at https://kevinholman.com/2019/03/14/security-changes-in-scom-2019-log-on-as-a-service/
  - Plrease refer to Microsoft Documentation at https://docs.microsoft.com/en-us/system-center/scom/enable-service-logon?view=sc-om-2019 .
 
+## Get-SCOMMPOwnProcessNTServiceGroup.ps1
+Gets the Group Ids used for Service Monitoring Templates.
 
  # TODO
 
