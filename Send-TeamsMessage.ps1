@@ -83,12 +83,6 @@ $Text = @"
 **Alert Description**: $Description<br/>
 "@
 
-$JsonHash = [ordered]@{
-
-title = $Alert
-text = $Text
-}
-
 $JsonCardHash = [ordered]@{
 '@type' = 'MessageCard' 
 '@context' = 'http://schema.org/extensions' 
