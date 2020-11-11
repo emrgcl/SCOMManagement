@@ -22,7 +22,7 @@ Param(
 [int32]$RetryCount = 5,
 [int32]$SleepSeconds = 5,
 [string]$LogFilePath = 'c:\Notifications\NotificationLog.txt',
-[string]$Uri =  'https://outlook.office.com/webhook/6df4982c-4212-4a63-a9a8-ef63a2207d62@832c1bc9-1e43-4f93-a086-708d36b0c95d/IncomingWebhook/3f6666718a1142d9bad866fbc3fb8cda/d095a22f-62ad-425b-83b3-dddef8b3bb7b'
+[string]$Uri =  'https://outlook.office.com/webhook/xxxx/IncomingWebhook/xxx/xxxx'
 
 
 )
