@@ -14,7 +14,7 @@
     VERBOSE: 12/21/2020 5:30:37 PM Number Events Caught = 0.
     VERBOSE: 12/21/2020 5:30:37 PM Script ended in 0 seconds.
 
-#>
+#>                                                                                                                                                          
 [CmdLetBinding()]
 Param(
 [string]$ContentPath = 'C:\temp\log3.txt',
@@ -124,7 +124,7 @@ for ($i=$LastLineIndex;$i -ge 0;$i--) {
     
             Status = 'Error'
             Content = $Content[$i]
-            Date = Get-DateFromString -DateString $DateString
+            Date = Get-DateFromString -DateString $DateString -LCID 1033
             LineHash = $CurrentHash
             Line = $i+1
     
