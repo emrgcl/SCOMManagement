@@ -40,6 +40,7 @@ Class BasicMonitoringEvent
     [string]$MonitoringObjectPath
     [String]$ServiceDisplayName
     [datetime]$TimeAdded
+    [string]$ErrorCode
  
 BasicMonitoringEvent() {}
  
@@ -49,7 +50,8 @@ BasicMonitoringEvent(
     [string]$MonitoringObjectDisplayName,
     [string]$MonitoringObjectPath,
     [String]$ServiceDisplayName,
-    [datetime]$TimeAdded
+    [datetime]$TimeAdded,
+    [string]$ErrorCode
  
  
 ){
@@ -60,6 +62,7 @@ BasicMonitoringEvent(
     this.MonitoringObjectPath = $MonitoringObjectPath
     this.ServiceDisplayName = $ServiceDisplayName
     this.TimeAdded = $TimeAdded
+    this.ErrorCode = $ErrorCode
  
  
 }
@@ -106,7 +109,8 @@ $Expression = @"
  
 $ScriptStart = Get-date
 $SelectTableName = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='$database' and TABLE_NAME = '$TableName'"
- 
+$InstanceRoot = "SQLSERVER:\SQL\$SQLServer\$Instance"
+$DatabaseRoot = "$InstanceRoot\Databases\$Database" 
  
  
 Write-Verbose "[$(Get-Date -Format G)] Script Started."
@@ -159,6 +163,7 @@ MonitoringObjectDisplayName = $_.MonitoringObjectDisplayName.ToString()
 MonitoringObjectPath = $_.MonitoringObjectPath.ToString()
 ServiceDisplayName = $_.ServiceDisplayName.ToString()
 TimeAdded = [datetime]$_.TimeAdded
+ErrorCode = $_.ErrorCode
  
 }
 }
@@ -168,12 +173,20 @@ Write-Verbose "[$(Get-Date -Format G)] Converted Events."
 # Drop table if it exists, we will create it during insert automatically.
 Try {
  
-if((Invoke-Sqlcmd -ServerInstance "$SQLServer\$Instance" -Database $Database -Query $SelectTableName -ErrorAction stop)) {
+Set-Location -Path $InstanceRoot -ErrorAction Stop
+if((Invoke-Sqlcmd -ServerInstance (Get-Item .) -Database $Database -Query $SelectTableName -ErrorAction stop)
+
+
+) {
  
 Write-Verbose "[$(Get-date -Format G)]Found $TableName table dropping."
  
-Invoke-Sqlcmd -ServerInstance "$SQLServer\$Instance" -Database $Database -Query "DROP TABLE [dbo].[$TableName]" -ErrorAction Stop
+Invoke-Sqlcmd -ServerInstance (Get-Item .) -Database $Database -Query "DROP TABLE [dbo].[$TableName]" -ErrorAction Stop
  
+} else {
+
+Write-Verbose "[$(Get-Date -Format G)] $TableName is not found in $Database. Script will create the table"
+
 }
 } catch {
  
@@ -185,9 +198,9 @@ Throw "[$(Get-Date -Format G)] Select or delete TableName`nError: $($_.Exception
  
 try {
  
-New-PSDrive -Name SCOMDashboard -PSProvider 'SQLServer' -root "SQLSERVER:\SQL\$SQLServer\$Instance\Databases\$Database" -ErrorAction stop | Out-Null
+New-PSDrive -Name SCOMDashboard -PSProvider 'SQLServer' -root $DatabaseRoot -ErrorAction stop | Out-Null
 cd 'SCOMDashboard:\Tables'
-Write-SqlTableData -TableName $TableName -InputData $ServiceStartEvents -Force -SchemaName dbo -ErrorAction Stop
+Write-SqlTableData -TableName $TableName -InputData $ConvertedEvents -Force -SchemaName dbo -ErrorAction Stop
 Write-Verbose "[$(Get-Date -Format G)] Inserted $($ConvertedEvents.Count) number of Rows in total"
  
 } 
@@ -203,4 +216,4 @@ cd c:\
 Remove-PSDrive SCOMDashboard
 }
  
-Write-verbose "[$(Get-date -Format G)] Script ended. Script dutation is $(((Get-date) - $ScriptStart).TotalSeconds)"  
+Write-verbose "[$(Get-date -Format G)] Script ended. Script dutation is $([Math]::Round(((Get-date) - $ScriptStart).TotalSeconds)) seconds."  
