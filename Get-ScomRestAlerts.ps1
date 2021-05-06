@@ -61,8 +61,7 @@ Param(
 
 )
 
-
-
+$Starttime = Get-Date
 # Set the Header and the Body
 $SCOMHeaders = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $SCOMHeaders.Add('Content-Type', 'application/json; charset=utf-8')
@@ -76,17 +75,18 @@ $URIBase = "http://$ManagementServer/OperationsManager/authenticate"
 Write-Verbose "Authentication URL = $URIBase"
  
 try {
-# Authentication
-$Authentication = Invoke-RestMethod -Method Post -Uri $URIBase -Headers $SCOMHeaders -body $JSONBody -UseDefaultCredentials -SessionVariable WebSession -ErrorAction stop
-# Initiate the Cross-Site Request Forgery (CSRF) token, this is to prevent CSRF attacks
-$CSRFtoken = $WebSession.Cookies.GetCookies($URIBase) | Where-Object { $_.Name -eq 'SCOM-CSRF-TOKEN' }
-Write-Verbose "Token from the webssion = $($CSRFtoken.Value)"
-$SCOMHeaders.Add('SCOM-CSRF-TOKEN', [System.Web.HttpUtility]::UrlDecode($CSRFtoken.Value))
+
+    # Authentication
+    $Authentication = Invoke-RestMethod -Method Post -Uri $URIBase -Headers $SCOMHeaders -body $JSONBody -UseDefaultCredentials -SessionVariable WebSession -ErrorAction stop
+    # Initiate the Cross-Site Request Forgery (CSRF) token, this is to prevent CSRF attacks
+    $CSRFtoken = $WebSession.Cookies.GetCookies($URIBase) | Where-Object { $_.Name -eq 'SCOM-CSRF-TOKEN' }
+    Write-Verbose "Token from the webssion = $($CSRFtoken.Value)"
+    $SCOMHeaders.Add('SCOM-CSRF-TOKEN', [System.Web.HttpUtility]::UrlDecode($CSRFtoken.Value))
 
 }
 Catch {
 
-throw "Could not authenticate, Exiting. Error: $($_.Exception.Message)"
+    throw "Could not authenticate, Exiting. Error: $($_.Exception.Message)"
 
 }
 $TokenLifeTimeHours = [Math]::Round((([datetime]::Parse( $Authentication.expiryTime))  - (Get-Date)).TotalHours,2)
@@ -116,3 +116,6 @@ $Response = Invoke-RestMethod -Uri "http://$ManagementServer/OperationsManager/d
 $Alerts = $Response.Rows
 Write-Verbose "$($Alerts.Count) number of alerts returned."
 $Alerts
+
+$ScriptDurationSeconds = [Math]::Round((Get-Date) - $Starttime).TotalSeconds)
+Write-Verbose "Script ended. Duration $ScriptDurationSeconds seconds."
