@@ -4,7 +4,7 @@
 .DESCRIPTION
    Gets scom rest alerts for exporting to third party systems.
 .EXAMPLE
-   .\Get-SCOMRestAlerts.ps1 -ManagementServer $env:COMPUTERNAME -Verbose
+   .\Get-SCOMRestAlerts.ps1 -WebConsole $env:COMPUTERNAME -Verbose
     
     VERBOSE: Authentication URL = http://SCOM/OperationsManager/authenticate
     VERBOSE: Token from the webssion = SCOM-CSRF-TOKEN=5jtpzpbbqZ9vIkBLM893DR_u6LvWTC-vECiSqMyM3jsi1viQMcXXKgI96EeAn-eMqkmL-5xh-V5RKDdbDwSPhwcUrMf7etptw1emnWt5XwE1%3aN6u7vu4vmiLLjbvMRzpSe-1GE2JgD6yDFScj99-J
@@ -55,7 +55,7 @@
 Param(
 
     [Parameter(Mandatory = $true)]
-    [string]$ManagementServer,
+    [string]$WebConsole,
     [ValidateSet('New','Closed','All')]
     $ResolutionState,
     [pscredential]$Credential
@@ -72,7 +72,7 @@ $EncodedText = [Convert]::ToBase64String($Bytes)
 $JSONBody = $EncodedText | ConvertTo-Json
  
 # The SCOM REST API authentication URL
-$URIBase = "http://$ManagementServer/OperationsManager/authenticate"
+$URIBase = "http://$WebConsole/OperationsManager/authenticate"
 Write-Verbose "Authentication URL = $URIBase"
  
 $AuthenticationParams = @{
@@ -133,7 +133,7 @@ $Query = @(@{
 # Convert our query to JSON format
 $JSONQuery = $Query | ConvertTo-Json
  
-$Response = Invoke-RestMethod -Uri "http://$ManagementServer/OperationsManager/data/alert" -Method Post -Body $JSONQuery -ContentType "application/json" -Headers $SCOMHeaders -WebSession $WebSession
+$Response = Invoke-RestMethod -Uri "http://$WebConsole/OperationsManager/data/alert" -Method Post -Body $JSONQuery -ContentType "application/json" -Headers $SCOMHeaders -WebSession $WebSession
  
 # Print out the alert results
 $Alerts = $Response.Rows
