@@ -117,5 +117,5 @@ $Alerts = $Response.Rows
 Write-Verbose "$($Alerts.Count) number of alerts returned."
 $Alerts
 
-$ScriptDurationSeconds = [Math]::Round((Get-Date) - $Starttime).TotalSeconds)
+$ScriptDurationSeconds = [Math]::Round(((Get-Date) - $Starttime).TotalSeconds)
 Write-Verbose "Script ended. Duration $ScriptDurationSeconds seconds."
