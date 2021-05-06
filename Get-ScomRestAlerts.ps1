@@ -159,14 +159,14 @@ $JSONBody = $EncodedText | ConvertTo-Json
 $URIBase = "http://$ManagementServer/OperationsManager/authenticate"
 Write-Verbose "Authentication URL = $URIBase"
  
+try {
+# Authentication
+$Authentication = Invoke-RestMethod -Method Post -Uri $URIBase -Headers $SCOMHeaders -body $JSONBody -UseDefaultCredentials -SessionVariable WebSession -ErrorAction stop
 # Initiate the Cross-Site Request Forgery (CSRF) token, this is to prevent CSRF attacks
 $CSRFtoken = $WebSession.Cookies.GetCookies($URIBase) | ? { $_.Name -eq 'SCOM-CSRF-TOKEN' }
 Write-Verbose "Token from the webssion = $CSRFtoken"
 $SCOMHeaders.Add('SCOM-CSRF-TOKEN', [System.Web.HttpUtility]::UrlDecode($CSRFtoken.Value))
 
-try {
-# Authentication
-$Authentication = Invoke-RestMethod -Method Post -Uri $URIBase -Headers $SCOMHeaders -body $JSONBody -UseDefaultCredentials -SessionVariable WebSession -ErrorAction stop
 }
 Catch {
 
