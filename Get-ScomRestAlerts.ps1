@@ -57,7 +57,8 @@ Param(
     [Parameter(Mandatory = $true)]
     [string]$ManagementServer,
     [ValidateSet('New','Closed','All')]
-    $ResolutionState
+    $ResolutionState,
+    [pscredential]$Credential
 
 )
 
@@ -74,10 +75,31 @@ $JSONBody = $EncodedText | ConvertTo-Json
 $URIBase = "http://$ManagementServer/OperationsManager/authenticate"
 Write-Verbose "Authentication URL = $URIBase"
  
+$AuthenticationParams = @{
+
+    Method = 'Post'
+    Uri = $URIBase
+    Headers = $SCOMHeaders
+    Body = $JSONBody
+    SessionVariable = 'WebSesion'
+    ErrorAction = 'Stop'
+
+}
+
+if ($Credential -and $Credential -is [pscredential]) {
+
+    $AuthenticationParams.Add('Credential',$Credential)
+
+} else {
+
+    $AuthenticationParams.Add('UseDefaultCredentials',$true)
+    
+}
+
 try {
 
     # Authentication
-    $Authentication = Invoke-RestMethod -Method Post -Uri $URIBase -Headers $SCOMHeaders -body $JSONBody -UseDefaultCredentials -SessionVariable WebSession -ErrorAction stop
+    $Authentication = Invoke-RestMethod @AuthenticationParams
     # Initiate the Cross-Site Request Forgery (CSRF) token, this is to prevent CSRF attacks
     $CSRFtoken = $WebSession.Cookies.GetCookies($URIBase) | Where-Object { $_.Name -eq 'SCOM-CSRF-TOKEN' }
     Write-Verbose "Token from the webssion = $($CSRFtoken.Value)"
