@@ -163,8 +163,8 @@ try {
 # Authentication
 $Authentication = Invoke-RestMethod -Method Post -Uri $URIBase -Headers $SCOMHeaders -body $JSONBody -UseDefaultCredentials -SessionVariable WebSession -ErrorAction stop
 # Initiate the Cross-Site Request Forgery (CSRF) token, this is to prevent CSRF attacks
-$CSRFtoken = $WebSession.Cookies.GetCookies($URIBase) | ? { $_.Name -eq 'SCOM-CSRF-TOKEN' }
-Write-Verbose "Token from the webssion = $CSRFtoken"
+$CSRFtoken = $WebSession.Cookies.GetCookies($URIBase) | Where-Object { $_.Name -eq 'SCOM-CSRF-TOKEN' }
+Write-Verbose "Token from the webssion = $($CSRFtoken.Value)"
 $SCOMHeaders.Add('SCOM-CSRF-TOKEN', [System.Web.HttpUtility]::UrlDecode($CSRFtoken.Value))
 
 }
@@ -194,7 +194,7 @@ $Query = @(@{
 # Convert our query to JSON format
 $JSONQuery = $Query | ConvertTo-Json
  
-$Response = Invoke-RestMethod -Uri "http://$ManagementServer/OperationsManager/data/alert" -Method Post -Body $JSONQuery -ContentType "application/json" -WebSession $WebSession
+$Response = Invoke-RestMethod -Uri "http://$ManagementServer/OperationsManager/data/alert" -Method Post -Body $JSONQuery -ContentType "application/json" -Headers $SCOMHeaders -WebSession $WebSession
  
 # Print out the alert results
 $Alerts = $Response.Rows
