@@ -81,7 +81,7 @@ $AuthenticationParams = @{
     Uri = $URIBase
     Headers = $SCOMHeaders
     Body = $JSONBody
-    SessionVariable = 'WebSesion'
+    SessionVariable = 'WebSession'
     ErrorAction = 'Stop'
 
 }
@@ -89,11 +89,12 @@ $AuthenticationParams = @{
 if ($Credential -and $Credential -is [pscredential]) {
 
     $AuthenticationParams.Add('Credential',$Credential)
+    Write-Verbose 'Credentials used adding.'
 
 } else {
 
     $AuthenticationParams.Add('UseDefaultCredentials',$true)
-    
+    Write-Verbose 'Credentials not used, using defaults.'    
 }
 
 try {
@@ -136,8 +137,7 @@ $Response = Invoke-RestMethod -Uri "http://$ManagementServer/OperationsManager/d
  
 # Print out the alert results
 $Alerts = $Response.Rows
-Write-Verbose "$($Alerts.Count) number of alerts returned."
 $Alerts
-
 $ScriptDurationSeconds = [Math]::Round(((Get-Date) - $Starttime).TotalSeconds)
+Write-Verbose "$($Alerts.Count) number of alerts returned."
 Write-Verbose "Script ended. Duration $ScriptDurationSeconds seconds."
