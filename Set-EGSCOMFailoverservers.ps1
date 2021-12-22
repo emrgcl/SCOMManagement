@@ -48,8 +48,8 @@ Throw "Could not connect to management server, '$ManagementServer'. Error: $($_.
 }
 
 $Agents = Get-SCOMAgent
+Write-Verbose "[$(Get-Date -Format G )] This MG has $($Agents.count) number of Agents."
 
-Write-Verbose "[$(Get-Date -Format G )] Working on $($Agents.count) number of Agents."
 
 #$PrimaryManagementServerNames = $Agents.PrimaryManagementServerName | Select-Object -Unique
 $ManagementServersToDistribute = Get-SCOMManagementServer -Name $ServerNamesToDistribute
@@ -60,8 +60,9 @@ $PrimaryManagementServerName = $PrimaryManagementServer.DisplayName
 $SelectedFailoverServers = $ManagementServersToDistribute | Where-Object {$_.DisplayName -ne $PrimaryManagementServerName}
 $SelectedAgents = $Agents | Where-Object {$_.PrimaryManagementServerName -eq $PrimaryManagementServerName}
 
+Write-Verbose "[$(Get-Date -Format G )] There are $($SelectedAgents.Count) number of agents attached to $PrimaryManagementServerName." 
 
-        if ($pscmdlet.ShouldProcess("$($SelectedFailoverServers.Displayname -join ',')", "Setting Failover servers where pimary ms is '$PrimaryManagementServerName'"))
+if ($pscmdlet.ShouldProcess("$($SelectedFailoverServers.Displayname -join ',')", "Setting Failover servers where pimary ms is '$PrimaryManagementServerName'"))
         {
            Set-SCOMParentManagementServer -Agent $SelectedAgents -FailoverServer $SelectedFailOverservers
         }
