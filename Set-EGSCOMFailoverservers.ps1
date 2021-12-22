@@ -61,8 +61,7 @@ $SelectedFailoverServers = $ManagementServersToDistribute | Where-Object {$_.Dis
 $SelectedAgents = $Agents | Where-Object {$_.PrimaryManagementServerName -eq $PrimaryManagementServerName}
 
 Write-Verbose "[$(Get-Date -Format G )] There are $($SelectedAgents.Count) number of agents attached to $PrimaryManagementServerName." 
-
-if ($pscmdlet.ShouldProcess("$($SelectedFailoverServers.Displayname -join ',')", "Setting Failover servers where pimary ms is '$PrimaryManagementServerName'"))
+if ($pscmdlet.ShouldProcess("$($SelectedFailoverServers.Displayname -join ',')", "Setting Failover servers where pimary ms is '$PrimaryManagementServerName'") -and $Null -ne $SelectedAgents -and @($SelectedAgents).Count -gt 0)
         {
            Set-SCOMParentManagementServer -Agent $SelectedAgents -FailoverServer $SelectedFailOverservers
         }
