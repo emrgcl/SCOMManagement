@@ -7,13 +7,13 @@
    .\Set-EGSCOMFailoverservers.ps1 -Verbose
 
    VERBOSE: [11/5/2021 11:47:55 AM] Script Started.
-VERBOSE: [11/5/2021 11:47:55 AM] Working on 200 number of Agents.
-VERBOSE: [11/5/2021 11:47:56 AM] 89 agents will be set, PrimaryMS: 'ms1.contoso.com', FailoverServerList: ms2.contoso.com,ms3.contoso.com 
-VERBOSE: Performing the operation "Setting Failover servers where pimary ms is 'ms1.contoso.com'" on target "ms2.contoso.com,ms3.contoso.com".
-VERBOSE: [11/5/2021 11:48:02 AM] 89 agents will be set, PrimaryMS: 'ms2.contoso.com', FailoverServerList: ms1.contoso.com,ms3.contoso.com 
-VERBOSE: Performing the operation "Setting Failover servers where pimary ms is 'ms2.contoso.com'" on target "ms1.contoso.com,ms3.contoso.com".
-VERBOSE: [11/5/2021 11:48:09 AM] 22 agents will be set, PrimaryMS: 'ms3.contoso.com', FailoverServerList: ms2.contoso.com,ms1.contoso.com 
-VERBOSE: Performing the operation "Setting Failover servers where pimary ms is 'ms3.contoso.com'" on target "ms2.contoso.com,ms1.contoso.com".
+   VERBOSE: [11/5/2021 11:47:55 AM] Working on 200 number of Agents.
+   VERBOSE: [11/5/2021 11:47:56 AM] 89 agents will be set, PrimaryMS: 'ms1.contoso.com', FailoverServerList: ms2.contoso.com,ms3.contoso.com 
+   VERBOSE: Performing the operation "Setting Failover servers where pimary ms is 'ms1.contoso.com'" on target "ms2.contoso.com,ms3.contoso.com".
+   VERBOSE: [11/5/2021 11:48:02 AM] 89 agents will be set, PrimaryMS: 'ms2.contoso.com', FailoverServerList: ms1.contoso.com,ms3.contoso.com 
+   VERBOSE: Performing the operation "Setting Failover servers where pimary ms is 'ms2.contoso.com'" on target "ms1.contoso.com,ms3.contoso.com".
+   VERBOSE: [11/5/2021 11:48:09 AM] 22 agents will be set, PrimaryMS: 'ms3.contoso.com', FailoverServerList: ms2.contoso.com,ms1.contoso.com 
+   VERBOSE: Performing the operation "Setting Failover servers where pimary ms is 'ms3.contoso.com'" on target "ms2.contoso.com,ms1.contoso.com".
 #>
 
 [CmdletBinding(
@@ -51,11 +51,15 @@ Write-Verbose "[$(Get-Date -Format G )] Working on $($Agents.count) number of Ag
 
 
 $PrimaryManagementServerNames = $Agents.PrimaryManagementServerName | Select-Object -Unique
+$PrimaryManagementServers = Get-SCOMManagementServer -Name $PrimaryManagementServerNames
 
 $FailoverServers = Get-SCOMManagementServer -Name $FailoverServerNames
 
-Foreach ($PrimaryManagementServerName in $PrimaryManagementServerNames) {
+Foreach ($PrimaryManagementServer in $PrimaryManagementServers) {
 
+if ($PrimaryManagementServer.IsGateway -eq $False) {
+
+$PrimaryManagementServerName = $PrimaryManagementServer.DisplayName
 $SelectedFailoverServers = $FailoverServers | where {$_.DisplayName -ne $PrimaryManagementServerName}
 $SelectedAgents = $Agents | where {$_.PrimaryManagementServerName -eq $PrimaryManagementServerName}
 
@@ -64,6 +68,6 @@ $SelectedAgents = $Agents | where {$_.PrimaryManagementServerName -eq $PrimaryMa
         {
            Set-SCOMParentManagementServer -Agent $SelectedAgents -FailoverServer $SelectedFailOverservers
         }
-
+}
 } 
  
