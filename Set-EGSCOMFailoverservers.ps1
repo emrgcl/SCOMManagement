@@ -24,9 +24,11 @@
 Param(
 
     [string]$ManagementServer = "ms1.contoso.com",
+    [Parameter(Mandatory=$true)]
     [String[]]$ServerNamesToDistribute = @('ms1.contoso.com','ms2.contoso.com','ms3.contoso.com')
 
 )
+$ScriptStart = Get-Date
 import-module operationsmanager -Verbose:$false
 
 
@@ -64,5 +66,7 @@ $SelectedAgents = $Agents | Where-Object {$_.PrimaryManagementServerName -eq $Pr
            Set-SCOMParentManagementServer -Agent $SelectedAgents -FailoverServer $SelectedFailOverservers
         }
 }
- 
+
+$DurationSeconds = [Math]::Round(((Get-Date) - $ScriptStart).TotalSeconds)
+Write-Verbose "[$(Get-Date -Format G )] Script ended. Duration: $DurationSeconds seconds."
  
