@@ -24,7 +24,7 @@
 Param(
 
     [string]$ManagementServer = "ms1.contoso.com",
-    [String[]]$FailoverServerNames = @('ms1.contoso.com','ms2.contoso.com','ms3.contoso.com')
+    [String[]]$ServerNamesToDistribute = @('ms1.contoso.com','ms2.contoso.com','ms3.contoso.com')
 
 )
 import-module operationsmanager -Verbose:$false
@@ -49,19 +49,14 @@ $Agents = Get-SCOMAgent
 
 Write-Verbose "[$(Get-Date -Format G )] Working on $($Agents.count) number of Agents."
 
+#$PrimaryManagementServerNames = $Agents.PrimaryManagementServerName | Select-Object -Unique
+$ManagementServersToDistribute = Get-SCOMManagementServer -Name $ServerNamesToDistribute
 
-$PrimaryManagementServerNames = $Agents.PrimaryManagementServerName | Select-Object -Unique
-$PrimaryManagementServers = Get-SCOMManagementServer -Name $PrimaryManagementServerNames
-
-$FailoverServers = Get-SCOMManagementServer -Name $FailoverServerNames
-
-Foreach ($PrimaryManagementServer in $PrimaryManagementServers) {
-
-if ($PrimaryManagementServer.IsGateway -eq $False) {
+Foreach ($PrimaryManagementServer in $ManagementServersToDistribute) {
 
 $PrimaryManagementServerName = $PrimaryManagementServer.DisplayName
-$SelectedFailoverServers = $FailoverServers | where {$_.DisplayName -ne $PrimaryManagementServerName}
-$SelectedAgents = $Agents | where {$_.PrimaryManagementServerName -eq $PrimaryManagementServerName}
+$SelectedFailoverServers = $ManagementServersToDistribute | Where-Object {$_.DisplayName -ne $PrimaryManagementServerName}
+$SelectedAgents = $Agents | Where-Object {$_.PrimaryManagementServerName -eq $PrimaryManagementServerName}
 
 
         if ($pscmdlet.ShouldProcess("$($SelectedFailoverServers.Displayname -join ',')", "Setting Failover servers where pimary ms is '$PrimaryManagementServerName'"))
@@ -69,5 +64,5 @@ $SelectedAgents = $Agents | where {$_.PrimaryManagementServerName -eq $PrimaryMa
            Set-SCOMParentManagementServer -Agent $SelectedAgents -FailoverServer $SelectedFailOverservers
         }
 }
-} 
+ 
  
