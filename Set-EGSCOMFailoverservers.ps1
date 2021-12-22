@@ -60,11 +60,13 @@ $PrimaryManagementServerName = $PrimaryManagementServer.DisplayName
 $SelectedFailoverServers = $ManagementServersToDistribute | Where-Object {$_.DisplayName -ne $PrimaryManagementServerName}
 $SelectedAgents = $Agents | Where-Object {$_.PrimaryManagementServerName -eq $PrimaryManagementServerName}
 
+if ($Null -ne $SelectedAgents -and @($SelectedAgents).Count -gt 0) {
 Write-Verbose "[$(Get-Date -Format G )] There are $($SelectedAgents.Count) number of agents attached to $PrimaryManagementServerName." 
-if ($pscmdlet.ShouldProcess("$($SelectedFailoverServers.Displayname -join ',')", "Setting Failover servers where pimary ms is '$PrimaryManagementServerName'") -and $Null -ne $SelectedAgents -and @($SelectedAgents).Count -gt 0)
+if ($pscmdlet.ShouldProcess("$($SelectedFailoverServers.Displayname -join ',')", "Setting Failover servers where pimary ms is '$PrimaryManagementServerName'") )
         {
            Set-SCOMParentManagementServer -Agent $SelectedAgents -FailoverServer $SelectedFailOverservers
         }
+}
 }
 
 $DurationSeconds = [Math]::Round(((Get-Date) - $ScriptStart).TotalSeconds)
