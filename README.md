@@ -20,6 +20,27 @@ Sets scom 2019 agent to work runas accounts with either logon as a service or lo
 ## Get-SCOMMPOwnProcessNTServiceGroup.ps1
 Gets the Group Ids used for Service Monitoring Templates.
 
+## Get-MPTCPTests.ps1
+Gets Lists the TCP Port Controls in SCOM with the related watchers and tcp tests configured.
+
+```
+    PS > .\Get-MPTCPTests.ps1 -XMlPath '.\TcpPort\CONTOSO.TCPPORT.MP.xml' -Verbose | where {$_.Port -eq 80}
+
+    VERBOSE: [07/04/2022 11:51:37] Script Started.
+    VERBOSE: [07/04/2022 11:51:38] Sucessfully imported '.\TcpPort\CONTISI.TCPPORT.MP.xml'. MPVersion: 1.0.0.0
+    VERBOSE: [07/04/2022 11:51:38] 348 TcpPort Control found in management pack.
+
+    DisplayName         Port ServerName    Watchers
+    -----------         ---- ----------    --------
+    CS ETS WS-APP LB 80   80 11.48.111.202 (SERVERDEV001.contoso.com|SERVERDEV002.contoso.com)
+    CS CC VTAPPLB 80      80 11.48.15.201  SERVERPRODX04.contoso.com
+    CS ATM Issuer LB 80   80 bsatmiss.con… SERVERPRODX26.contoso.com
+    CS ATM Issuer1 80     80 11.48.10.39   SERVERPRODX26.contoso.com
+    CS ATM Issuer2 80     80 11.48.10.40   SERVERPRODX26.contoso.com
+    CS CC TTS1 80         80 11.48.15.108  SERVERPRODX04.contoso.com
+    CS CC TTS2 80         80 11.48.15.109  SERVERPRODX04.contoso.com
+```
+
  # TODO
 
  - update set-scomhslogontype.ps1 to refer to  tmfver.dll autoamtically.
